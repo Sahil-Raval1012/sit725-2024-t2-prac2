@@ -1,12 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
-const querystring = require('querystring');
+const request = require('querystring');
 
 const server = http.createServer((req, res) => {
-    const parsedUrl = url.parse(req.url, true);
+    const Url = url.parse(req.url, true);
 
-    if (req.method === 'GET' && parsedUrl.pathname === '/') {
+    if (req.method === 'GET' && Url.pathname === '/') {
         fs.readFile('index.html', (err, data) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
@@ -16,27 +16,24 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(data);
         });
-    } else (req.method === 'POST' && parsedUrl.pathname === '/'); {
-
+    } else if (req.method === 'POST' && Url.pathname === '/') {
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
         });
         req.on('end', () => {
-            const parsedBody = querystring.parse(body);
-            const name = parsedBody.name || 'World';
+            const newBody = request.parse(body);
+            const name = newBody.name || 'World';
             res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(`<html><body><h1>Welcome to the page,, ${name}!</h1></body></html>`);
+            res.end(`<html><body><h1>Welcome to the page, ${name}!</h1></body></html>`);
         });
-    } 
+    } else {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found');
+    }
 });
 
 const port = 8080;
 server.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
 });
-
-
-
-
-
